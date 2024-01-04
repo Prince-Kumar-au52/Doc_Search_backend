@@ -136,11 +136,12 @@ export const addDoctor = asyncHandler(async (req, res) => {
     // Create an appointment associated with the doctor
     const appointmentData = {
       doctorId: doctor._id, // Use the doctor's ID
-      userId: null, // No user ID initially
+      // userId: null, // No user ID initially
       appointmentId: appointmentId,
     };
 
     const appointment = await Appointment.create(appointmentData);
+    console.log(appointment);
     // deleteFile();
     res.status(201).json({
       success: true,

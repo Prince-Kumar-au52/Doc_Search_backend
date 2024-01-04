@@ -6,13 +6,12 @@ import { v4 as uuid } from "uuid";
 
 export const addUser = asyncHandler(async (req, res) => {
   try {
-    const { FirstName, LastName, Email, Password, Mobile, City, Referral } =
-      req.body;
+    const { FirstName, Email, Password, Mobile, City, Referral } = req.body;
     // const { City, State, ZipCode, Country } = Address;
 
     const user = await User.create({
       FirstName,
-      LastName,
+
       Email,
       Password,
       Mobile,

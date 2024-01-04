@@ -1,11 +1,17 @@
 import asyncHandler from "express-async-handler";
 import User from "../modles/userSignup_login.js";
-import { addUser, deleteUser, getUserById, getUsers, loginUser, updateUser } from "../services/userSignup_login.js";
-
+import {
+  addUser,
+  deleteUser,
+  getUserById,
+  getUsers,
+  loginUser,
+  updateUser,
+} from "../services/userSignup_login.js";
 
 export const AddUser = asyncHandler(async (req, res) => {
   try {
-    const { FirstName, LastName, Email, Password ,Mobile,City,Referral } = req.body;
+    const { FirstName, Email, Password, Mobile, City, Referral } = req.body;
 
     const useAvailable = await User.findOne({ Email });
     if (useAvailable) {
