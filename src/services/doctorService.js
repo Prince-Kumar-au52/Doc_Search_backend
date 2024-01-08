@@ -370,3 +370,38 @@ const deleteFile = () => {
     console.log(`Directory '${dirPath}' does not exist.`);
   }
 };
+
+export const getDoctorByAdmin = asyncHandler(
+  async (paginationOptions, filter, sort) => {
+    try {
+      const { page, size } = paginationOptions;
+      const totalDocuments = await Doctor.countDocuments(filter);
+      const totalPages = Math.ceil(totalDocuments / size);
+      const skip = (page - 1) * size;
+
+      const collation = {
+        locale: "en",
+        strength: 2,
+      };
+
+      const success = await Doctor.find(filter)
+        .collation(collation)
+        .populate("doctorTimeDateId")
+        .sort(sort)
+        .skip(skip)
+        .limit(size);
+
+      return {
+        page,
+        size,
+        data: success,
+        previousPage: page > 1 ? page - 1 : null,
+        nextPage: page < totalPages ? page + 1 : null,
+        totalDocuments,
+      };
+    } catch (e) {
+      console.log(e);
+      throw new Error(e);
+    }
+  }
+);

@@ -1,14 +1,16 @@
-import express from "express";
+import express, { Router } from "express";
 
 import {
   AddDoctor,
   DeleteDoctor,
   GetDoctor,
+  GetDoctorByAdmin,
   GetDoctorById,
   LoginDoctor,
   UpdateDoctor,
 } from "../controllers/doctor.controller.js";
 import { doctorValidation } from "../validators/doctorValidator.js";
+import { verifyToken } from "../helper/token_verify.js";
 const router = express.Router();
 
 const validatedoctor = (req, res, next) => {
@@ -23,8 +25,9 @@ const validatedoctor = (req, res, next) => {
 
 router.post("/addDoctor", validatedoctor, AddDoctor);
 router.get("/getDoctor", GetDoctor);
-router.delete("/deleteDoctor/:id", DeleteDoctor);
-router.put("/updateDoctor/:id", UpdateDoctor);
+router.delete("/deleteDoctor/:id", verifyToken, DeleteDoctor);
+router.put("/updateDoctor/:id", verifyToken, UpdateDoctor);
 router.get("/getDoctorById/:id", GetDoctorById);
 router.post("/login", LoginDoctor);
+router.get("/getDoctorByAdmin", GetDoctorByAdmin);
 export default router;
