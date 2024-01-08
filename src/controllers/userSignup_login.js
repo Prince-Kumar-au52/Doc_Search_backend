@@ -30,7 +30,9 @@ export const AddUser = asyncHandler(async (req, res) => {
 export const LoginUser = asyncHandler(async (req, res) => {
   try {
     const user = await loginUser(req, res);
-    return res.status(200).send({ user, massage: "login Successfully" });
+    return res
+      .status(200)
+      .send({ success: true, user, massage: "login Successfully" });
   } catch (error) {
     res.status(400).json({
       success: false,

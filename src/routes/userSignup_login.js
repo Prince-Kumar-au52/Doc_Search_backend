@@ -1,4 +1,5 @@
 import express from "express";
+import { verifyToken } from "../helper/token_verify.js"
 
 import { userSinupValidation } from "../validators/userSignup_login.js";
 import {
@@ -23,9 +24,9 @@ const validateUsers = (req, res, next) => {
 
 router.post("/UserSignup", validateUsers, AddUser);
 router.post("/Userlogin", LoginUser);
-router.get("/getUsers", GetUsers);
-router.delete("/deleteUser/:id", DeleteUser);
-router.put("/updateUser/:id", UpdateUser);
-router.get("/getUserById/:id", GetUserById);
+router.get("/getUsers",verifyToken, GetUsers);
+router.delete("/deleteUser/:id",verifyToken, DeleteUser);
+router.put("/updateUser/:id",verifyToken, UpdateUser);
+router.get("/getUserById/:id",verifyToken, GetUserById);
 
 export default router;
