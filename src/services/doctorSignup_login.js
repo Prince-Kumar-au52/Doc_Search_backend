@@ -1,118 +1,148 @@
-import asyncHandler from "express-async-handler";
-import User from "../modles/doctorSignup_login.js";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
+import asyncHandler from "express-async-handler";
+import Doctor from "../modles/doctorSignup_login.js";
 
-export const addUser = asyncHandler(async (req, res) => {
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "pk95259381@gmail.com",
+    pass: "fktpqwfcyfbufvki",
+  },
+});
+
+const generateOTP = () => {
+  const otpLength = 6;
+  let otp = "";
+
+  for (let i = 0; i < otpLength; i++) {
+    otp += Math.floor(Math.random() * 10);
+  }
+
+  return otp;
+};
+
+// Function to send OTP via email
+const sendOTP = async (email, otp) => {
+  const mailOptions = {
+    from: "pk95259381@gmail.com",
+    to: email,
+    subject: "OTP for Account",
+    text: `Your OTP is: ${otp}`,
+  };
+
   try {
-    const { FirstName, LastName, Email, Password } = req.body;
-    // const { City, State, ZipCode, Country } = Address;
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent: " + info.response);
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to send OTP via email");
+  }
+};
 
-    const hashpassword = await bcrypt.hash(Password, 10);
+// Function to register a new user
+export const adddoctor = asyncHandler(async (req, res) => {
+  const { Email } = req.body;
 
-    const user = await User.create({
-      FirstName,
-      LastName,
-      Email,
-      Password: hashpassword, // Use the hashed password
-    });
+  try {
+    // Check if a doctor with the given email already exists
+    let doctor = await Doctor.findOne({ Email });
+
+    if (doctor) {
+      // Doctor exists, update OTP and handle timeout logic
+      const currentTime = new Date();
+      const otpTimeout = 1 * 60 * 1000; // 5 minutes timeout
+
+      // Check if OTP is still valid (within the timeout)
+      if (doctor.OTPExpiration && currentTime < doctor.OTPExpiration) {
+        res.status(400).json({
+          success: false,
+          message:
+            "OTP is still valid. Please wait before requesting a new one.",
+        });
+        return;
+      }
+
+      // Generate a new OTP and update the expiration time
+      const newOTP = generateOTP();
+      const newExpiration = new Date(currentTime.getTime() + otpTimeout);
+
+      // Update doctor data in the database
+      doctor = await Doctor.findOneAndUpdate(
+        { Email },
+        { OTP: newOTP, OTPExpiration: newExpiration },
+        { new: true }
+      );
+    } else {
+      // Doctor does not exist, create a new one
+      const otp = generateOTP();
+
+      // Logic to create a doctor user in the database using your Doctor model goes here
+      doctor = await Doctor.create({
+        Email: Email,
+        OTP: otp,
+        OTPExpiration: new Date(new Date().getTime() + 1 * 60 * 1000), // Set OTP expiration time (5 minutes)
+      });
+    }
+
+    // Send OTP to the doctor's email
+    const send = await sendOTP(Email, doctor.OTP);
 
     res.status(201).json({
       success: true,
-      data: user,
+      data: doctor,
+      message: "OTP sent successfully",
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       success: false,
       error: error.message,
     });
   }
 });
 
-export const loginUser = asyncHandler(async (req, res) => {
-  const { Email, Password } = req.body;
+export const doctorLogin = asyncHandler(async (req, res) => {
+  const { OTP } = req.body;
 
-  const user = await User.findOne({ Email });
+  try {
+    // Find a user with the given OTP
+    const doctor = await Doctor.findOne({ OTP });
 
-  if (user && (await bcrypt.compare(Password, user.Password))) {
+    if (!doctor) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+      return;
+    }
+
+    // You may want to add additional checks here, depending on your use case
+
+    // Generate an access token for the user
     const accessToken = jwt.sign(
       {
-        userData: {
-          username: user.FirstName,
-          email: user.Email,
-          id: user.id,
-          roleId: user.roleId,
+        doctorData: {
+          Email: doctor.Email,
+          id: doctor.id,
         },
       },
       process.env.secretKey,
       { expiresIn: process.env.Range }
     );
-    //console.log(accessToken)
-    return {
+
+    res.status(200).json({
+      success: true,
       token: accessToken,
-      roleid: user.roleId,
-    };
-  } else {
-    res.status(401);
-    throw new Error("User or Password is Wrong");
+      Email: doctor.Email,
+      id: doctor.id,
+      message: "Login successful",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
   }
-});
-
-export const getUsers = asyncHandler(
-  async (paginationOptions, filter, sort) => {
-    try {
-      const { page, size } = paginationOptions;
-      const totalDocuments = await User.countDocuments(filter);
-      const totalPages = Math.ceil(totalDocuments / size);
-      const skip = (page - 1) * size;
-
-      const collation = {
-        locale: "en",
-        strength: 2,
-      };
-
-      const success = await User.find(filter)
-        .collation(collation)
-        .sort(sort)
-        .skip(skip)
-        .limit(size)
-        .populate("roleId");
-
-      return {
-        page,
-        size,
-        data: success,
-        previousPage: page > 1 ? page - 1 : null,
-        nextPage: page < totalPages ? page + 1 : null,
-        totalDocuments,
-      };
-    } catch (e) {
-      console.log(e);
-      throw new Error(e);
-    }
-  }
-);
-
-export const deleteUser = asyncHandler(async (req, res) => {
-  const id = req.params.id;
-  const success = await User.findByIdAndDelete(id);
-  if (success) {
-    res.status(200).send({ success, message: "Ok deleted ......" });
-  } else {
-    return { error: "not deleted..." };
-  }
-});
-
-export const getUserById = asyncHandler(async (id) => {
-  const success = await User.findById(id).populate("roleId");
-  console.log(success);
-  return success;
-});
-
-export const updateUser = asyncHandler(async (id, updatedData) => {
-  const success = await User.findByIdAndUpdate(id, updatedData, {
-    new: true,
-  });
-  console.log(success);
-  return success;
 });

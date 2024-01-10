@@ -1,11 +1,9 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
-  // roleId: { type: mongoose.Schema.Types.ObjectId, ref: "Role" },
-  FirstName: String,
-  LastName: String,
-  Email: String,
-  Password: String,
+const doctorOTP = new mongoose.Schema({
+  Email: { type: String },
+  OTP: { type: String },
+  OTPExpiration: { type: Date },
 });
 
-export default mongoose.model("DoctorSignup_login", userSchema);
+export default mongoose.model("DocterSigupLogin", doctorOTP);

@@ -6,7 +6,6 @@ import {
   GetDoctor,
   GetDoctorByAdmin,
   GetDoctorById,
-  LoginDoctor,
   UpdateDoctor,
 } from "../controllers/doctor.controller.js";
 import { doctorValidation } from "../validators/doctorValidator.js";
@@ -28,6 +27,6 @@ router.get("/getDoctor", GetDoctor);
 router.delete("/deleteDoctor/:id", verifyToken, DeleteDoctor);
 router.put("/updateDoctor/:id", verifyToken, UpdateDoctor);
 router.get("/getDoctorById/:id", GetDoctorById);
-router.post("/login", LoginDoctor);
+// router.post("/login", LoginDoctor);
 router.get("/getDoctorByAdmin", GetDoctorByAdmin);
 export default router;

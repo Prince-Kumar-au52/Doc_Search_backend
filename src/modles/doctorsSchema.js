@@ -31,11 +31,11 @@ const doctorSchema = new mongoose.Schema({
     type: [String],
   },
   photo: { type: String },
-  password: { type: String },
+  // password: { type: String },
   registration: { type: String },
   name: { type: String },
   mobile: { type: String },
-  email: { type: String },
+  // email: { type: String },
   qualification: { type: String },
   specialization: {
     type: String,

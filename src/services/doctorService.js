@@ -3,10 +3,7 @@ import Doctor from "../modles/doctorsSchema.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import path from "path";
-// import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import Appointment from "../modles/docterUserAppointment.js";
-import { v4 as uuid } from "uuid";
 
 cloudinary.config({
   cloud_name: "dydfngksk",
@@ -26,13 +23,13 @@ export const addDoctor = asyncHandler(async (req, res) => {
       morning,
       afternoon,
       evening,
-      photo,
+      // photo,
       doctorTimeDateId,
-      password,
+      // password,
       registration,
       name,
       mobile,
-      email,
+      // email,
       qualification,
       specialization,
       experience,
@@ -41,13 +38,13 @@ export const addDoctor = asyncHandler(async (req, res) => {
       blood_group,
     } = req.body;
 
-    const existingDoctor = await Doctor.findOne({ email });
-    if (existingDoctor) {
-      return res.status(400).json({
-        success: false,
-        error: "Doctor email already exists.",
-      });
-    }
+    // const existingDoctor = await Doctor.findOne({ email });
+    // if (existingDoctor) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     error: "Doctor email already exists.",
+    //   });
+    // }
 
     const { house_street_no, colony_locality, city, state, country, pincode } =
       req.body;
@@ -102,11 +99,11 @@ export const addDoctor = asyncHandler(async (req, res) => {
       evening,
       photo: profilePictureUrl,
       doctorTimeDateId,
-      password,
+      // password,
       registration,
       name,
       mobile,
-      email,
+      // email,
       qualification,
       specialization,
       experience,
@@ -142,7 +139,7 @@ export const addDoctor = asyncHandler(async (req, res) => {
 
     // const appointment = await Appointment.create(appointmentData);
     // console.log(appointment);
-    // deleteFile();
+    deleteFile();
     res.status(201).json({
       success: true,
       data: doctor,
@@ -156,53 +153,53 @@ export const addDoctor = asyncHandler(async (req, res) => {
   }
 });
 
-export const loginDoctor = asyncHandler(async (req, res) => {
-  const { email, mobile, password } = req.body;
+// export const loginDoctor = asyncHandler(async (req, res) => {
+//   const { email, mobile, password } = req.body;
 
-  try {
-    let doctor;
+//   try {
+//     let doctor;
 
-    // Check if the user exists with the provided email
-    doctor = await Doctor.findOne({ mobile });
+//     // Check if the user exists with the provided email
+//     doctor = await Doctor.findOne({ mobile });
 
-    if (doctor) {
-      // If the user was not found by email, check with mobile
-      doctor = await Doctor.findOne({ email });
-    }
+//     if (doctor) {
+//       // If the user was not found by email, check with mobile
+//       doctor = await Doctor.findOne({ email });
+//     }
 
-    if (doctor && doctor.password === password) {
-      // Password is correct
+//     if (doctor && doctor.password === password) {
+//       // Password is correct
 
-      // Create JWT token
-      const accessToken = jwt.sign(
-        {
-          doctorData: {
-            doctorname: doctor.name,
-            email: doctor.email,
-            mobile: doctor.mobile,
-            id: doctor.id,
-          },
-        },
-        process.env.secretKey,
-        { expiresIn: process.env.Range }
-      );
+//       // Create JWT token
+//       const accessToken = jwt.sign(
+//         {
+//           doctorData: {
+//             doctorname: doctor.name,
+//             email: doctor.email,
+//             mobile: doctor.mobile,
+//             id: doctor.id,
+//           },
+//         },
+//         process.env.secretKey,
+//         { expiresIn: process.env.Range }
+//       );
 
-      res.status(200).json({
-        success: true,
-        token: accessToken,
-        doctorId: doctor.id,
-      });
-    } else {
-      // User or password is wrong
-      res
-        .status(401)
-        .json({ success: false, message: "User or Password is Wrong" });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-});
+//       res.status(200).json({
+//         success: true,
+//         token: accessToken,
+//         doctorId: doctor.id,
+//       });
+//     } else {
+//       // User or password is wrong
+//       res
+//         .status(401)
+//         .json({ success: false, message: "User or Password is Wrong" });
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ success: false, message: "Internal Server Error" });
+//   }
+// });
 
 export const getDoctorById = asyncHandler(async (id) => {
   const success = await Doctor.findById(id).populate("doctorTimeDateId");
@@ -333,6 +330,7 @@ export const updateDoctor = asyncHandler(async (req, res) => {
     };
 
     const appointment = await Appointment.create(appointmentData);
+    deleteFile();
     res.status(200).json({
       success: true,
       data: updatedDoctor,
@@ -348,7 +346,7 @@ export const updateDoctor = asyncHandler(async (req, res) => {
 
 const deleteFile = () => {
   const __filename = new URL(import.meta.url).pathname;
-  const _dirname = path.dirname(_filename);
+  const __dirname = path.dirname(__filename);
 
   const dirPath = decodeURIComponent(
     path.join(__dirname, "../../tmp").slice(1).replace(/\\/g, "/")
