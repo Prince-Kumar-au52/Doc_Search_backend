@@ -22,7 +22,7 @@ const validatedoctor = (req, res, next) => {
   next();
 };
 
-router.post("/addDoctor", validatedoctor, AddDoctor);
+router.post("/addDoctor",verifyToken, validatedoctor, AddDoctor);
 router.get("/getDoctor", GetDoctor);
 router.delete("/deleteDoctor/:id", verifyToken, DeleteDoctor);
 router.put("/updateDoctor/:id", verifyToken, UpdateDoctor);

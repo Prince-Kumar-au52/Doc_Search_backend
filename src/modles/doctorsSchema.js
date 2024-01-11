@@ -35,7 +35,7 @@ const doctorSchema = new mongoose.Schema({
   registration: { type: String },
   name: { type: String },
   mobile: { type: String },
-  // email: { type: String },
+  email: { type: String },
   qualification: { type: String },
   specialization: {
     type: String,

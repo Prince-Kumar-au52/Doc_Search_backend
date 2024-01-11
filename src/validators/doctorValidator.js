@@ -16,6 +16,8 @@ const doctorValidation = Joi.object({
   mobile: Joi.string()
     .length(10)
     .pattern(/^[0-9]+$/),
+
+  email: Joi.string(),
   qualification: Joi.string(),
   specialization: Joi.string(),
   experience: Joi.number(),
