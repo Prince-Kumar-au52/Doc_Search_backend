@@ -89,6 +89,10 @@ const doctorSchema = new mongoose.Schema({
   govt_id_proof: { type: String },
 
   Upload_Photo: { type: String, enum: [] },
+  // email:[{
+  //   type:mongoose.Schema.Types.ObjectId,
+  //   ref:"DocterSigupLogin"
+  // }]
 });
 
 export default mongoose.model("Doctor", doctorSchema);

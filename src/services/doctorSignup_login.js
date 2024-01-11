@@ -8,11 +8,11 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: "pk95259381@gmail.com",
-    pass: "fktpqwfcyfbufvki",
+    user: "doc.helpsearch@gmail.com",
+    pass: "ndtiavpjrvlkexnl",
   },
 });
-
+// ndtiavpjrvlkexnl;
 const generateOTP = () => {
   const otpLength = 6;
   let otp = "";
@@ -27,10 +27,11 @@ const generateOTP = () => {
 // Function to send OTP via email
 const sendOTP = async (email, otp) => {
   const mailOptions = {
-    from: "pk95259381@gmail.com",
+    from: "doc.helpsearch@gmail.com",
     to: email,
-    subject: "OTP for Account",
-    text: `Your OTP is: ${otp}`,
+    subject: "Doc Search OTP for Account",
+    text: `${otp} is the OTP for Registration Valid for 10 mins. Do not share with anyone.
+     Call 8809149036 if not requested by you - Doc Search`,
   };
 
   try {
@@ -53,7 +54,7 @@ export const adddoctor = asyncHandler(async (req, res) => {
     if (doctor) {
       // Doctor exists, update OTP and handle timeout logic
       const currentTime = new Date();
-      const otpTimeout = 1 * 60 * 1000; // 5 minutes timeout
+      const otpTimeout = 10 * 60 * 1000; // 5 minutes timeout
 
       // Check if OTP is still valid (within the timeout)
       if (doctor.OTPExpiration && currentTime < doctor.OTPExpiration) {
@@ -83,7 +84,7 @@ export const adddoctor = asyncHandler(async (req, res) => {
       doctor = await Doctor.create({
         Email: Email,
         OTP: otp,
-        OTPExpiration: new Date(new Date().getTime() + 1 * 60 * 1000), // Set OTP expiration time (5 minutes)
+        OTPExpiration: new Date(new Date().getTime() + 10 * 60 * 1000), // Set OTP expiration time (5 minutes)
       });
     }
 
