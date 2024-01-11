@@ -13,6 +13,7 @@ const doctorValidation = Joi.object({
   photo: Joi.string(),
   registration: Joi.string(),
   name: Joi.string(),
+  completed: Joi.boolean(),
   mobile: Joi.string()
     .length(10)
     .pattern(/^[0-9]+$/),

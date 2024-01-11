@@ -7,6 +7,7 @@ import {
   getDoctorById,
   // loginDoctor,
   updateDoctor,
+  updateDoctorByAdmin,
 } from "../services/doctorService.js";
 
 export const AddDoctor = asyncHandler(async (req, res) => {
@@ -61,6 +62,10 @@ export const GetDoctorByAdmin = asyncHandler(async (req, res) => {
       error: error.message,
     });
   }
+});
+
+export const UpdateDoctorByAdmin = asyncHandler(async (req, res) => {
+  const success = await updateDoctorByAdmin(req, res);
 });
 
 export const DeleteDoctor = asyncHandler(async (req, res) => {

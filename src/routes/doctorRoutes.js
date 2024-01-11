@@ -7,6 +7,7 @@ import {
   GetDoctorByAdmin,
   GetDoctorById,
   UpdateDoctor,
+  UpdateDoctorByAdmin,
 } from "../controllers/doctor.controller.js";
 import { doctorValidation } from "../validators/doctorValidator.js";
 import { verifyToken } from "../helper/token_verify.js";
@@ -22,11 +23,12 @@ const validatedoctor = (req, res, next) => {
   next();
 };
 
-router.post("/addDoctor",verifyToken, validatedoctor, AddDoctor);
+router.post("/addDoctor", validatedoctor, AddDoctor);
 router.get("/getDoctor", GetDoctor);
 router.delete("/deleteDoctor/:id", verifyToken, DeleteDoctor);
 router.put("/updateDoctor/:id", verifyToken, UpdateDoctor);
 router.get("/getDoctorById/:id", GetDoctorById);
 // router.post("/login", LoginDoctor);
 router.get("/getDoctorByAdmin", GetDoctorByAdmin);
+router.put("/updateDoctorByAdmin/:id", UpdateDoctorByAdmin);
 export default router;

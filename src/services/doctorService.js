@@ -26,6 +26,7 @@ export const addDoctor = asyncHandler(async (req, res) => {
       // photo,
       doctorTimeDateId,
       // password,
+      completed,
       registration,
       name,
       mobile,
@@ -100,6 +101,7 @@ export const addDoctor = asyncHandler(async (req, res) => {
       photo: profilePictureUrl,
       doctorTimeDateId,
       // password,
+      completed,
       registration,
       name,
       mobile,
@@ -210,6 +212,7 @@ export const getDoctorById = asyncHandler(async (id) => {
 export const getDoctor = asyncHandler(
   async (paginationOptions, filter, sort) => {
     try {
+      filter = { ...filter, completed: true };
       const { page, size } = paginationOptions;
       const totalDocuments = await Doctor.countDocuments(filter);
       const totalPages = Math.ceil(totalDocuments / size);
@@ -320,21 +323,21 @@ export const updateDoctor = asyncHandler(async (req, res) => {
     //   { appointmentId: appointmentId },
     //   { new: true }
     // );
-    const appointmentId = Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;
+    // const appointmentId = Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;
 
     // // Create an appointment associated with the doctor
-    const appointmentData = {
-      doctorId: id, // Use the doctor's ID
-      // userId: null, // No user ID initially
-      appointmentId: appointmentId,
-    };
+    // const appointmentData = {
+    //   doctorId: id, // Use the doctor's ID
+    //   // userId: null, // No user ID initially
+    //   appointmentId: appointmentId,
+    // };
 
-    const appointment = await Appointment.create(appointmentData);
+    // const appointment = await Appointment.create(appointmentData);
     deleteFile();
     res.status(200).json({
       success: true,
       data: updatedDoctor,
-      appointmentId: appointment,
+      // appointmentId: appointment,
     });
   } catch (error) {
     res.status(400).json({
@@ -372,6 +375,7 @@ const deleteFile = () => {
 export const getDoctorByAdmin = asyncHandler(
   async (paginationOptions, filter, sort) => {
     try {
+      // filter = { ...filter, completed: false };
       const { page, size } = paginationOptions;
       const totalDocuments = await Doctor.countDocuments(filter);
       const totalPages = Math.ceil(totalDocuments / size);
@@ -403,3 +407,65 @@ export const getDoctorByAdmin = asyncHandler(
     }
   }
 );
+
+export const updateDoctorByAdmin = asyncHandler(async (req, res) => {
+  try {
+    const id = req.params.id;
+    let updatedData = req.body;
+
+    // const appointmentId = Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;
+
+    // // Create an appointment associated with the doctor
+    // const appointmentData = {
+    //   doctorId: id, // Use the doctor's ID
+    //   userId: null, // No user ID initially
+    //   appointmentId: appointmentId,
+    // };
+
+    if (req.files && req.files.ProfilePicture) {
+      const file = req.files.ProfilePicture;
+      const result = await cloudinary.uploader.upload(file.tempFilePath);
+      updatedData.ProfilePicture = result.secure_url;
+    }
+    const updatedDoctorByAdmin = await Doctor.findByIdAndUpdate(
+      id,
+      updatedData,
+      {
+        new: true,
+      }
+    );
+
+    if (!updatedDoctorByAdmin) {
+      return res.status(404).json({
+        success: false,
+        error: "Doctor not found",
+      });
+    }
+    // const updatedAppointment = await Appointment.findOneAndUpdate(
+    //   { doctorId: id },
+    //   { appointmentId: appointmentId },
+    //   { new: true }
+    // );
+    // const appointmentId = Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;
+
+    // // Create an appointment associated with the doctor
+    // const appointmentData = {
+    //   doctorId: id, // Use the doctor's ID
+    //   // userId: null, // No user ID initially
+    //   appointmentId: appointmentId,
+    // };
+
+    // const appointment = await Appointment.create(appointmentData);
+    deleteFile();
+    res.status(200).json({
+      success: true,
+      data: updatedDoctorByAdmin,
+      // appointmentId: appointment,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
